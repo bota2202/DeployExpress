@@ -3,15 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#050505">
+    <meta name="theme-color" content="#0b0a08">
     <title>{{ $title ?? 'DeployExpress' }} · DeployExpress</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/app.css">
 </head>
 <body class="{{ request()->routeIs('login') ? 'page-login' : '' }}">
-<canvas id="bg" aria-hidden="true"></canvas>
 <div id="nav-progress"></div>
 <div class="app">
 @auth
@@ -20,7 +19,7 @@
 <aside>
     <a class="brand" href="{{ route('dashboard') }}">
         <span class="mark">@include('icons.truck')</span>
-        <span>DeployExpress<small>Produção &amp; Logística</small></span>
+        <span class="name">DeployExpress<small>Produção &amp; Logística</small></span>
     </a>
     <nav class="menu">
         @if($u->hasRole('fabrica', 'expedicao', 'gerencia'))
@@ -44,6 +43,14 @@
     </div>
 </aside>
 @endauth
+@guest
+@unless(request()->routeIs('login'))
+<header class="topbar">
+    <a class="brand" href="{{ route('track') }}"><span class="mark">@include('icons.truck')</span><span class="name">DeployExpress<small>Rastreio público</small></span></a>
+    <a class="btn small" href="{{ route('login') }}">Entrar</a>
+</header>
+@endunless
+@endguest
 <div class="content">
     @yield('page')
     @hasSection('content')

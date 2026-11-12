@@ -1,25 +1,30 @@
 @extends('layout', ['title' => 'Rastreio'])
 @section('content')
-<div style="max-width:640px;margin:0 auto">
-    <h1>Rastrear entrega</h1>
-    <div class="card">
-        <form method="get" action="{{ route('track') }}">
-            <label>Código de rastreio</label>
-            <input name="codigo" value="{{ $code }}" placeholder="Ex.: DXDEMO0001" required>
-            <p><button class="btn">Buscar</button></p>
-        </form>
-    </div>
+<div class="track-wrap">
+    <header class="head center">
+        <div>
+            <span class="kicker">Rastreio público</span>
+            <h1>Onde está a <em>sua carga?</em></h1>
+            <p class="lede">Digite o código que começa com DX e acompanhe cada parada da entrega.</p>
+        </div>
+    </header>
+
+    <form class="search paper" method="get" action="{{ route('track') }}">
+        <input name="codigo" value="{{ $code }}" placeholder="DXDEMO0001" required aria-label="Código de rastreio">
+        <button class="btn">Rastrear</button>
+    </form>
 
     @if($code && ! $delivery)
-        <div class="alert error">Nenhuma entrega encontrada com o código <strong>{{ $code }}</strong>.</div>
+        <div class="alert error">@include('icons.alert') Nenhuma entrega encontrada com o código <strong>{{ $code }}</strong>.</div>
     @elseif($delivery)
-        <div class="card">
-            <strong>{{ $delivery->tracking_code }}</strong> · {{ $delivery->quantity }}× {{ $delivery->product->name }}<br>
-            Status atual: <span class="badge {{ $delivery->status }}">{{ \App\Models\Delivery::STATUSES[$delivery->status] }}</span>
+        <div class="card paper">
+            <span class="badge {{ $delivery->status }}">{{ \App\Models\Delivery::STATUSES[$delivery->status] }}</span>
+            <div class="big-code">{{ $delivery->tracking_code }}</div>
+            <strong>{{ $delivery->quantity }}× {{ $delivery->product->name }}</strong>
         </div>
+        @include('route', ['status' => $delivery->status])
         <h2>Linha do tempo</h2>
         @include('timeline', ['events' => $delivery->events])
     @endif
-    @guest<p class="muted"><a href="{{ route('login') }}">Entrar no sistema</a></p>@endguest
 </div>
 @endsection

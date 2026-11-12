@@ -1,27 +1,39 @@
 @extends('layout', ['title' => 'Entrega '.$delivery->tracking_code])
 @section('content')
-<h1>Entrega {{ $delivery->tracking_code }} <span class="badge {{ $delivery->status }}">{{ \App\Models\Delivery::STATUSES[$delivery->status] }}</span></h1>
+<header class="head">
+    <div>
+        <span class="kicker">Entrega</span>
+        <h1><em>{{ $delivery->tracking_code }}</em></h1>
+        <p class="lede">{{ $delivery->quantity }}× {{ $delivery->product->name }} para {{ $delivery->customer->name }}</p>
+    </div>
+    <span class="badge {{ $delivery->status }}">{{ \App\Models\Delivery::STATUSES[$delivery->status] }}</span>
+</header>
+
+@include('route', ['status' => $delivery->status])
+
 <div class="card">
-    <strong>{{ $delivery->quantity }}× {{ $delivery->product->name }}</strong> ({{ $delivery->product->code }})<br>
-    Cliente: {{ $delivery->customer->name }}<br>
-    Endereço: {{ $delivery->address }}<br>
-    <span class="muted">Link público: <a href="{{ route('track', ['codigo' => $delivery->tracking_code]) }}">{{ route('track', ['codigo' => $delivery->tracking_code]) }}</a></span>
+    <dl class="details">
+        <div><dt>Produto</dt><dd>{{ $delivery->quantity }}× {{ $delivery->product->name }} ({{ $delivery->product->code }})</dd></div>
+        <div><dt>Cliente</dt><dd>{{ $delivery->customer->name }}</dd></div>
+        <div><dt>Endereço</dt><dd>{{ $delivery->address }}</dd></div>
+        <div><dt>Link público</dt><dd><a href="{{ route('track', ['codigo' => $delivery->tracking_code]) }}">{{ route('track', ['codigo' => $delivery->tracking_code]) }}</a></dd></div>
+    </dl>
 </div>
 
 @if(auth()->user()->hasRole('expedicao', 'gerencia') && $delivery->status !== 'entregue')
-<div class="card">
-    <h2 style="margin-top:0">Registrar evento</h2>
+<h2>Registrar evento</h2>
+<div class="card paper">
     <form method="post" action="{{ route('deliveries.event', $delivery) }}">
         @csrf
         <div class="grid">
-            <div><label>Status</label>
-                <select name="status" required>
+            <div><label for="status">Status</label>
+                <select id="status" name="status" required>
                     @foreach(\App\Models\Delivery::STATUSES as $k => $v)
                         <option value="{{ $k }}" @selected(old('status', $delivery->status) === $k)>{{ $v }}</option>
                     @endforeach
                 </select></div>
-            <div><label>Local</label><input name="location" value="{{ old('location') }}" placeholder="Ex.: Registro - SP"></div>
-            <div><label>Observação</label><input name="note" value="{{ old('note') }}"></div>
+            <div><label for="location">Local</label><input id="location" name="location" value="{{ old('location') }}" placeholder="Ex.: Registro - SP"></div>
+            <div><label for="note">Observação</label><input id="note" name="note" value="{{ old('note') }}"></div>
         </div>
         <p><button class="btn">Registrar</button></p>
     </form>

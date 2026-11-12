@@ -1,73 +1,63 @@
 // Efeitos visuais do DeployExpress. Tudo desliga se o sistema pedir "reduzir movimento".
 (() => {
+    // ---- abertura (só na primeira visita da sessão) ----
+    const intro = document.querySelector('.intro');
+    try {
+        if (intro && sessionStorage.getItem('dx-intro')) intro.remove();
+        sessionStorage.setItem('dx-intro', '1');
+    } catch (e) { /* storage bloqueado: mostra a abertura e segue */ }
+
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const root = document.documentElement;
 
-    // ---- fundo: partículas conectadas (rede) ----
-    const canvas = document.getElementById('bg');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        let w, h, pts = [], mouse = { x: -9999, y: -9999 };
-        const N = Math.min(90, Math.floor(innerWidth / 14));
-        const resize = () => { w = canvas.width = innerWidth; h = canvas.height = innerHeight; };
-        resize();
-        addEventListener('resize', resize);
-        addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-        for (let i = 0; i < N; i++) pts.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3, r: 1 + Math.random() * 1.2, c: Math.random() < .12 ? '255,106,0' : '255,255,255' });
-        const draw = () => {
-            ctx.clearRect(0, 0, w, h);
-            for (const p of pts) {
-                p.x += p.vx; p.y += p.vy;
-                if (p.x < 0 || p.x > w) p.vx *= -1;
-                if (p.y < 0 || p.y > h) p.vy *= -1;
-                const dm = Math.hypot(p.x - mouse.x, p.y - mouse.y);
-                if (dm < 140) { p.x += (p.x - mouse.x) / dm * .6; p.y += (p.y - mouse.y) / dm * .6; }
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${p.c},.45)`; ctx.fill();
-            }
-            for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
-                const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
-                if (d < 130) { ctx.strokeStyle = `rgba(255,255,255,${(1 - d / 130) * .12})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
-            }
-            requestAnimationFrame(draw);
-        };
-        draw();
-    }
+    // ---- holofote + grade seguindo o mouse ----
+    let raf = 0, mx = 0, my = 0;
+    addEventListener('pointermove', e => {
+        mx = e.clientX; my = e.clientY;
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+            raf = 0;
+            root.style.setProperty('--sx', mx + 'px');
+            root.style.setProperty('--sy', my + 'px');
+        });
+    });
 
-    // ---- números do painel sobem do zero ----
-    document.querySelectorAll('.stat .n').forEach(el => {
+    // ---- etiquetas do login com paralaxe ----
+    const side = document.querySelector('.login-side');
+    if (side) side.addEventListener('pointermove', e => {
+        side.style.setProperty('--px', (e.clientX / innerWidth - .5) * 2);
+        side.style.setProperty('--py', (e.clientY / innerHeight - .5) * 2);
+    });
+
+    // ---- títulos entram palavra por palavra ----
+    document.querySelectorAll('h1:not(.login h1), .mega').forEach(h => {
+        let i = 0;
+        [...h.childNodes].forEach(node => {
+            const wrap = el => { const s = document.createElement('span'); s.className = 'w'; s.style.setProperty('--i', i++); s.append(el); return s; };
+            if (node.nodeType === 3) {
+                const parts = node.textContent.split(/(\s+)/).filter(Boolean);
+                node.replaceWith(...parts.map(p => /^\s+$/.test(p) ? document.createTextNode(p) : wrap(p)));
+            } else if (node.nodeName !== 'BR') {
+                node.replaceWith(wrap(node.cloneNode(true)));
+            }
+        });
+    });
+
+    // ---- cascata: índice de cada item para o atraso da animação ----
+    document.querySelectorAll('.bento, .products, .pipe, .timeline, .feats').forEach(g => [...g.children].forEach((c, i) => c.style.setProperty('--i', i)));
+    document.querySelectorAll('table').forEach(t => [...t.querySelectorAll('tr:has(td)')].forEach((r, i) => r.style.setProperty('--i', Math.min(i, 8))));
+
+    // ---- números sobem do zero ----
+    document.querySelectorAll('.stat .n, .seg .n, .product .n').forEach(el => {
         const end = parseInt(el.textContent, 10);
         if (isNaN(end) || end === 0) return;
-        const t0 = performance.now(), dur = 1000;
+        const t0 = performance.now() + 250, dur = 1300;
         const tick = now => {
-            const p = Math.min(1, (now - t0) / dur);
-            el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3)));
+            const p = Math.max(0, Math.min(1, (now - t0) / dur));
+            el.textContent = Math.round(end * (1 - Math.pow(1 - p, 4)));
             if (p < 1) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
-    });
-
-    // ---- cards com inclinação 3D seguindo o mouse ----
-    document.querySelectorAll('.stat').forEach(card => {
-        card.addEventListener('mousemove', e => {
-            const r = card.getBoundingClientRect();
-            const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-            card.style.setProperty('--mx', `${(x + .5) * 100}%`);
-            card.style.setProperty('--my', `${(y + .5) * 100}%`);
-            card.style.transform = `rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateY(-3px)`;
-        });
-        card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-    });
-
-    // ---- ondulação nos botões ----
-    document.addEventListener('click', ev => {
-        const btn = ev.target.closest('.btn');
-        if (!btn) return;
-        const r = btn.getBoundingClientRect(), s = Math.max(r.width, r.height);
-        const dot = document.createElement('span');
-        dot.className = 'ripple';
-        dot.style.cssText = `width:${s}px;height:${s}px;left:${ev.clientX - r.left - s / 2}px;top:${ev.clientY - r.top - s / 2}px`;
-        btn.appendChild(dot);
-        setTimeout(() => dot.remove(), 650);
     });
 
     // ---- barra de progresso ao navegar ----

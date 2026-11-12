@@ -48,16 +48,20 @@ php artisan serve
 - Migration única: `database/migrations/2026_11_11_000001_create_app_tables.php`. Seeder: `DatabaseSeeder` (usuários, 3 produtos, 3 ordens, 1 entrega com eventos).
 - Teste: `tests/Feature/FlowTest.php` (perda + estoque, estoque insuficiente, cliente vê só o seu, 403, rastreio público).
 
-## Visual (decisão final após 3 iterações)
+## Visual (4ª iteração: "industrial brutalista")
 
-Estilo "editorial dark" inspirado em recent.design: preto puro `#050505`, bordas 1px `#1e1e22`, tipografia grande, rótulos em mono, botões pílula brancos → laranja `#ff6a00` no hover, laranja é a única cor de destaque. Sidebar fixa com ícones.
+Inspirado em estheet.com (cinema escuro, holofote, desfoque→foco), simplyraffle.com (neo-brutalismo: bordas grossas, sombra dura, selos inclinados) e izaeats.com (fonte larga em caixa alta, título em duas cores, números gigantes, cartões creme).
 
-Animações (em `public/js/app.js` e `public/css/app.css`): partículas conectadas em canvas (`#bg`) que fogem do mouse, grão animado, entrada em cascata, contadores, cards 3D com luz seguindo o mouse, ripple, barra de progresso, texto "digitando" no login, borda laranja girando no card de login. Tudo desliga com `prefers-reduced-motion`.
+- Cores: fundo preto quente `#0b0a08`, papel creme `#f2ebdd`, laranja `#ff6a00` como destaque; amarelo `#ffd23f` só em avisos/status.
+- Fontes: Archivo largo (`font-stretch:125%`, peso 900, caixa alta) nos títulos/números, Instrument Serif itálico nos subtítulos (`.lede`), Inter no corpo, JetBrains Mono nos rótulos.
+- Padrão de página: `<header class="head">` com `.kicker` (selo), `h1` com a palavra de destaque em `<em>` e `.lede` opcional. Formulários em `.card.paper`. Tabelas dentro de `<div class="table">`.
+- Peças: bento de números no painel (`.stat.hero` com faixa zebrada), faixa rolando (`.ticker`), barras por status (`.pipe`), cartões de produto, rota com caminhão (`route.blade.php`), linha do tempo numerada, etiquetas de envio flutuando no login.
+- Animações (`public/js/app.js` + `public/css/app.css`): holofote + grade de planta seguindo o mouse, grão, títulos entram palavra a palavra com desfoque, contadores, View Transitions entre páginas, abertura "DeployExpress" no login (1x por sessão), paralaxe das etiquetas. Tudo desliga com `prefers-reduced-motion`.
 
-Tentativas descartadas pelo usuário: neon azul/ciano com fundo aurora (muito "gamer"); claro corporativo (achou feio). Não voltar para esses.
+Tentativas descartadas pelo usuário: neon azul/ciano com fundo aurora (muito "gamer"); claro corporativo (achou feio); editorial dark com partículas (achou básico). Não voltar para esses.
 
 ## Pendências / não feito
 
-- Nada commitado ainda além do commit inicial (usuário pediu para aguardar).
+- Commits: não incluir o Claude como coautor (sem linha `Co-Authored-By`).
 - Sem: editar/excluir usuários, trocar senha, excluir produto, paginação, tema claro.
 - O `CLAUDE.md` do template Laravel pedia `laravel/boost`; não instalado de propósito.
