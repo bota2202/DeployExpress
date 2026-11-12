@@ -379,13 +379,13 @@ form p { margin: 26px 0 0; display: flex; gap: 14px; align-items: center; flex-w
 .intro span + span { color: var(--accent); animation-delay: .22s; }
 @keyframes intro-out { to { opacity: 0; visibility: hidden; filter: blur(12px); } }
 
-body.page-login .app { display: grid; grid-template-columns: 1.25fr 1fr; min-height: 100vh; }
+body.page-login .content { display: grid; grid-template-columns: 1.25fr 1fr; min-height: 100vh; }
 .login-side { position: relative; overflow: hidden; padding: 48px 60px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; border-right: 2px solid var(--line); }
 .login-side > :not(.tags) { position: relative; z-index: 1; }
 .login-side .brand { padding: 0; }
 .login-side .typed { min-height: 22px; margin-bottom: 22px; font: 500 13px var(--mono); color: var(--accent); letter-spacing: .04em; }
 .login-side .typed::after { content: "▍"; animation: blink 1s steps(1) infinite; }
-.mega { display: block; margin: 0; font: 900 clamp(44px, 6.2vw, 112px)/.88 var(--display); font-stretch: 125%; text-transform: uppercase; letter-spacing: -.03em; }
+.mega { display: block; margin: 0; font: 900 clamp(40px, min(5.6vw, 9vh), 112px)/.88 var(--display); font-stretch: 125%; text-transform: uppercase; letter-spacing: -.03em; }
 .mega em { font-style: normal; color: var(--accent); }
 .mega::before, .mega::after { content: none; }
 .mega .w { display: inline-block; animation: focus-in 1s var(--ease) both; animation-delay: calc(var(--i, 0) * 90ms + .3s); }
@@ -417,7 +417,7 @@ body.page-login .app { display: grid; grid-template-columns: 1.25fr 1fr; min-hei
 .tag i { display: block; height: 20px; background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 8px, var(--ink) 8px 11px, transparent 11px 13px); }
 @keyframes float { from { transform: rotate(var(--r)) translateY(-8px); } to { transform: rotate(calc(var(--r) + 3deg)) translateY(10px); } }
 
-.login-form { display: grid; place-items: center; padding: 40px 32px; }
+.login-form { position: sticky; top: 0; height: 100vh; align-self: start; display: grid; place-items: center; padding: 40px 32px; overflow-y: auto; }
 .login { width: min(430px, 100%); padding: 40px 36px; animation: drop .9s .5s var(--ease) both; }
 @keyframes drop { from { opacity: 0; transform: translateY(-40px) rotate(4deg); } }
 .login h1 { font-size: 40px; margin-bottom: 8px; }
@@ -443,7 +443,8 @@ body.page-login .app { display: grid; grid-template-columns: 1.25fr 1fr; min-hei
     .pipe { grid-template-columns: repeat(2, 1fr); }
     .seg:nth-child(2) { border-right: 0; }
     .seg:nth-child(-n+2) { border-bottom: 2px solid var(--line-2); }
-    body.page-login .app { grid-template-columns: 1fr; }
+    body.page-login .content { grid-template-columns: 1fr; }
+    .login-form { position: static; height: auto; }
     .login-side { padding: 32px 22px; border-right: 0; }
     .login-side small, .feats, .tag:nth-child(n+4) { display: none; }
     .tag { --o: .35 !important; }
